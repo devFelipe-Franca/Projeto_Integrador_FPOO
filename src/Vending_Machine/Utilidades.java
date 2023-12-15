@@ -11,7 +11,7 @@ public class Utilidades {
 	
 	
 	public static void criarItems(ArrayList<Produtos> items) {
-		System.out.println("Criando items...\n");
+		
 		for (int i = 1; i < 11; i++) {
 			int codigo = i;
 			String produto = "";
@@ -36,7 +36,7 @@ public class Utilidades {
             if (scnobj.hasNextLine()) {
             	scnobj.nextLine();
             }
-            System.out.println("Lendo CSV...\n");
+            
             while (scnobj.hasNextLine()) {
                 String linha = scnobj.nextLine();
          
@@ -71,8 +71,8 @@ public class Utilidades {
 		 }
 		 
 		 System.out.println(lista_items);
+		 System.out.print("------------------------------------------------------------------\n");
 	}
-	
 	
 	public static void deletarItem(ArrayList<Produtos> items) {
 		Scanner scn = new Scanner(System.in);
@@ -129,13 +129,9 @@ public class Utilidades {
 	                  .append("\n");
             }
 
-            System.out.println("Arquivo CSV criado com sucesso!");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        System.out.println("Salvando...");
 	}
 	
 	
@@ -172,15 +168,15 @@ public class Utilidades {
 	
 	
 	public static void autorizacao() {
-		Scanner scn = new Scanner(System.in);
+		Scanner scn2 = new Scanner(System.in);
 
 		boolean autorizacao = true;
 		while(autorizacao == true) {
 			System.out.println("\nLogin:");
-			String login = scn.nextLine();
+			String login = scn2.nextLine();
 			 
 			System.out.printf("("+login+") Senha: ");
-			String senha = scn.nextLine();
+			String senha = scn2.nextLine();
 			 
 			if(login.equals("admin") & senha.equals("admin")) {
 				System.out.println("\nVocê entrou como administrador!\n");
@@ -196,7 +192,7 @@ public class Utilidades {
 	
 	
 	public static String menu() {
-		 Scanner scn = new Scanner(System.in);
+		 Scanner scn2 = new Scanner(System.in);
 		 
 			 System.out.println("<1> - Atualizar item\n"       +
 			 		        	"<2> - Listar items\n"         +
@@ -205,7 +201,7 @@ public class Utilidades {
 			 		        	"<5> - Sair sem salvar\n"      +
 			                    "<6> - Resetar vending machine");
 			 
-			 String opcao = scn.nextLine(); 	
+			 String opcao = scn2.nextLine(); 	
 			 return opcao;
 	}
 	
@@ -217,5 +213,134 @@ public class Utilidades {
 		System.out.println("Preço: "    + item.getPreco()     );
 		System.out.println("Quantidade: " + item.getQuantidade());
 		System.out.println("------------------------------------\n");
+	}
+	
+	public static void atualizarEstoque(ArrayList<Produtos> items, ArrayList<Integer> lista_quantidade,ArrayList<Integer> lista_compras) {
+		for (int i = 0; i < lista_quantidade.size(); i++) {
+			for (Produtos item : items) {
+				if (lista_compras.get(i) == item.getCodigo()) {
+					int atualizar_estoque = item.getQuantidade() - lista_quantidade.get(i) ;
+					item.setQuantidade(atualizar_estoque);
+				}
+			}
+		}
+	}
+	
+	public static void pagarPix(ArrayList<Produtos> items, ArrayList<Integer> lista_quantidade,ArrayList<Integer> lista_compras) {
+		Scanner scn2 = new Scanner(System.in);
+		System.out.println("Chave pix: 0115");
+		System.out.println("Chave:");
+		scn2.nextLine();
+		System.out.println("...");
+		System.out.println("Pagamento realizado!");
+		System.out.println("Obrigado pela compra volte sempre!");
+		
+		Utilidades.atualizarEstoque(items,lista_quantidade,lista_compras);
+	}
+	
+	public static void pagarDebito(ArrayList<Produtos> items, ArrayList<Integer> lista_quantidade,ArrayList<Integer> lista_compras) {
+		Scanner scn2 = new Scanner(System.in);
+		System.out.println("Insira o cartão...");
+		System.out.println("Senha: ");
+		scn2.nextLine();
+		System.out.println("...");
+		System.out.println("Autorizado!");
+		System.out.println("Obrigado pela compra volte sempre!");
+		
+		Utilidades.atualizarEstoque(items,lista_quantidade,lista_compras);
+	}
+	
+	public static void pagarDinheiro(Double total,ArrayList<Produtos> items, ArrayList<Integer> lista_quantidade,ArrayList<Integer> lista_compras) {
+		Scanner scn2 = new Scanner(System.in);
+		Double troco = 0.0;
+		boolean pagar = true;
+		while (pagar == true) {
+		System.out.println("Cédulas aceitas: 2 - 5 - 10 - 20 - 50 - 100\n" +
+						   "Valor do pagamento: ");
+		Double pagamento = scn2.nextDouble();  
+	
+			if (pagamento < total) {
+				System.out.println("Pagamento insuficiente!");
+				continue;
+			}
+			
+			troco = pagamento - total;
+		
+			
+			
+			if (troco > 50) {
+				System.out.println("Troco acima do limite!");
+				continue;
+				
+			}
+			else if (troco > 0) {
+				System.out.println("Aqui está seu troco: R$ " + troco);
+				System.out.println("Obrigado pela compra volte sempre!");
+			}
+			
+			else {
+				System.out.println("Obrigado pela compra volte sempre!");
+			}
+			pagar = false;
+			}
+		
+		Utilidades.atualizarEstoque(items,lista_quantidade,lista_compras);
+	}
+	
+	public static String metodoPagamento(String lista_items, Double total) {
+		Scanner scn2 = new Scanner(System.in);
+		System.out.println("------------------------------------------------------------------");
+		System.out.println(lista_items);
+		System.out.println("Valor total: R$ " + total);
+		System.out.println("------------------------------------------------------------------\n");
+		
+		System.out.println("Qual o método de pagamento?\n" +
+						   "D - Dinheiro \nCD - Cartão de débito \nPIX - Pix\n" +
+						   "Troco máximo de R$ 50,00\n");
+		String metodo = scn2.nextLine();
+		
+		return metodo;
+	}
+	
+	public static String realizarCompra(ArrayList<Produtos> items, ArrayList<Integer> lista_quantidade,ArrayList<Integer> lista_compras, String lista_items, Double preco,Double total) {
+		Scanner scn = new Scanner(System.in);
+		Scanner scn2 = new Scanner(System.in);
+		
+		String continuar_compra = "S";
+		vendingMachineLoop:
+		while(continuar_compra.equalsIgnoreCase("S")) {
+			
+		
+		System.out.println("------------------------------------------------------------------");
+		System.out.println("*************************Vending Machine**************************");
+		System.out.println("------------------------------------------------------------------\n");
+		Utilidades.listarItems(items);
+		System.out.println("Digite o código do item que deseja comprar: ");
+		int selecionar_compra = scn.nextInt(); 
+		System.out.println("\nQuantidade: ");
+		int quantidade = scn.nextInt(); 
+		
+		for (Produtos item : items) {
+			if(selecionar_compra == item.getCodigo()) {
+				if(quantidade > item.getQuantidade()) {
+					System.out.println("\nQuantidade indisponível!\n");
+					continue vendingMachineLoop;
+				}
+				else {
+					lista_compras.add(selecionar_compra);
+					lista_quantidade.add(quantidade);
+					lista_items += item.getCodigo()+"\t\t"+item.getProduto()+"\t\t\t"+item.getPreco() * quantidade+"\t\t"+quantidade+"\n";
+					preco = item.getPreco() * quantidade; 
+					
+				}
+			}
+		}
+		total = total + preco;
+		System.out.println("\n<S> - Para adicionar mais items ao carrinho\n"+
+						     "<N> - Para finalizar a compra");
+		continuar_compra = scn2.nextLine();
+		}
+		
+		return continuar_compra;
 	}
 }

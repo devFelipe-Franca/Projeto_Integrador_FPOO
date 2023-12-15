@@ -9,6 +9,8 @@ public class Main_Vending_Machine {
 	public static void main(String[] args) {
 		
 		ArrayList<Produtos> items = new ArrayList<>();
+		ArrayList<Integer> lista_compras = new ArrayList<>();
+		ArrayList<Integer> lista_quantidade = new ArrayList<>();
 		
 		Scanner scn = new Scanner(System.in);
 		Scanner scn2 = new Scanner(System.in);
@@ -44,28 +46,49 @@ public class Main_Vending_Machine {
 					 
 					 else if(opcao.equals("4")) {  
 						 Utilidades.salvarCSV(items);
+					     System.out.println("Salvando e saindo...");
 						 menu_ = false;
-						 break;
 					 }
 					 
 					 else if(opcao.equals("5")) {  
 					   	System.out.println("Saindo sem salvar...");
 					   	menu_ = false;
-						break;
-						
 					 }
 					
 					 else if(opcao.equals("6")) {
 					  	Utilidades.resetarVending(items);
 					 } 
 				 }
-				
+				 break;
 			case "1":	
+				Utilidades.lerCSV(items);
 				
-				System.out.println("Digite o código do item que deseja comprar: ");
-				int selecionar_compra = scn.nextInt(); 
+				Double total = 0.0;
+				Double preco = 0.0;
+				String lista_items = "Código\t\tProduto\t\t\tSubtotal - R$\tQuantidade\n";
 				
-				
-		  	}
+				String continuar_compra = Utilidades.realizarCompra(items, lista_quantidade, lista_compras, lista_items, preco, total);
+				if(continuar_compra.equalsIgnoreCase("N")) {
+					String metodo = Utilidades.metodoPagamento(lista_items, total);
+										
+					switch(metodo) {
+					
+					case "D":
+						Utilidades.pagarDinheiro(total, items, lista_quantidade, lista_compras);
+						Utilidades.salvarCSV(items);
+						break;
+					
+					case "CD" :
+						Utilidades.pagarDebito(items, lista_quantidade, lista_compras);
+						Utilidades.salvarCSV(items);
+						break;
+						
+					case "PIX" :
+						Utilidades.pagarPix(items, lista_quantidade, lista_compras);
+						Utilidades.salvarCSV(items);
+						break;
+					}
+			}
+		}	
 	}
 }
